@@ -2,6 +2,7 @@ package runner
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/netip"
@@ -52,6 +53,9 @@ func (r *Runner) handleServiceFingerprinting() error {
 	baseCfg := scan.Config{
 		DefaultTimeout: r.options.Timeout,
 		Verbose:        r.options.Verbose || r.options.Debug,
+		Proxy:          r.options.Proxy,
+		ProxyAuth:      r.options.ProxyAuth,
+		DNSOrder:       r.options.DnsOrder,
 	}
 
 	run := func(targets []plugins.Target, udp bool) {
@@ -62,7 +66,7 @@ func (r *Runner) handleServiceFingerprinting() error {
 		cfg := baseCfg
 		cfg.UDP = udp
 
-		results, err := scan.ScanTargets(targets, cfg)
+		results, err := scan.ScanTargets(context.Background(), targets, cfg)
 		if err != nil {
 			transport := "tcp"
 			if udp {
@@ -170,6 +174,9 @@ func (r *Runner) enrichHostResultPorts(hostResult *result.HostResult) []*port.Po
 	baseCfg := scan.Config{
 		DefaultTimeout: r.options.Timeout,
 		Verbose:        r.options.Verbose || r.options.Debug,
+		Proxy:          r.options.Proxy,
+		ProxyAuth:      r.options.ProxyAuth,
+		DNSOrder:       r.options.DnsOrder,
 	}
 
 	var tcpTargets, udpTargets []plugins.Target
@@ -206,7 +213,7 @@ func (r *Runner) enrichHostResultPorts(hostResult *result.HostResult) []*port.Po
 		cfg := baseCfg
 		cfg.UDP = udp
 
-		services, err := scan.ScanTargets(targets, cfg)
+		services, err := scan.ScanTargets(context.Background(), targets, cfg)
 		if err != nil {
 			transport := "tcp"
 			if udp {
