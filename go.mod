@@ -4,10 +4,10 @@ go 1.24.0
 
 require (
 	github.com/Mzack9999/gcache v0.0.0-20230410081825-519e28eab057
+	github.com/Mzack9999/gopacket v0.0.0-20260306231411-c992bef03b8e
 	github.com/Ullaakut/nmap/v3 v3.0.6
 	github.com/armon/go-socks5 v0.0.0-20160902184237-e75332964ef5
 	github.com/asaskevich/govalidator v0.0.0-20230301143203-a9d515a09cc2
-	github.com/gopacket/gopacket v1.2.0
 	github.com/logrusorgru/aurora v2.0.3+incompatible
 	github.com/miekg/dns v1.1.62
 	github.com/pkg/errors v0.9.1
@@ -23,6 +23,7 @@ require (
 	github.com/projectdiscovery/mapcidr v1.1.97
 	github.com/projectdiscovery/networkpolicy v0.1.34
 	github.com/projectdiscovery/ratelimit v0.0.83
+	github.com/projectdiscovery/retryabledns v1.0.113
 	github.com/projectdiscovery/retryablehttp-go v1.3.6
 	github.com/projectdiscovery/uncover v1.2.0
 	github.com/projectdiscovery/utils v0.9.0
@@ -31,7 +32,7 @@ require (
 	go.uber.org/multierr v1.11.0
 	golang.org/x/exp v0.0.0-20250106191152-7588d65b2ba8
 	golang.org/x/net v0.48.0
-	golang.org/x/sys v0.39.0
+	golang.org/x/sys v0.41.0
 )
 
 require (
@@ -59,6 +60,7 @@ require (
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/docker/go-units v0.5.0 // indirect
 	github.com/dsnet/compress v0.0.2-0.20230904184137-39efe44ab707 // indirect
+	github.com/ebitengine/purego v0.10.0 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/gaissmai/bart v0.26.0 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
@@ -95,7 +97,6 @@ require (
 	github.com/projectdiscovery/fastdialer v0.5.4 // indirect
 	github.com/projectdiscovery/hmap v0.0.100 // indirect
 	github.com/projectdiscovery/machineid v0.0.0-20250715113114-c77eb3567582 // indirect
-	github.com/projectdiscovery/retryabledns v1.0.113 // indirect
 	github.com/refraction-networking/utls v1.8.2 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/saintfish/chardet v0.0.0-20230101081208-5e3ef4b5456d // indirect

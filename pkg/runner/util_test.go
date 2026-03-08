@@ -22,7 +22,7 @@ func Test_host2ips(t *testing.T) {
 		{"10.10.10.0/24", nil, nil, true},
 	}
 
-	r, err := NewRunner(&Options{IPVersion: []string{scan.IPv4, scan.IPv6}, Retries: 1})
+	r, err := NewRunner(&Options{IPVersion: []string{scan.IPv4, scan.IPv6}, Retries: 1, DnsOrder: "lp"})
 	require.Nil(t, err)
 	dnsclient, err := dnsx.New(dnsx.DefaultOptions)
 	require.Nil(t, err)
