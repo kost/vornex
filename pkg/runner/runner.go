@@ -208,7 +208,9 @@ func NewRunner(options *Options) (*Runner, error) {
 }
 
 func (r *Runner) onReceive(hostResult *result.HostResult) {
-	if !ipMatchesIpVersions(hostResult.IP, r.options.IPVersion...) {
+	if r.options.Proxy != "" && !iputil.IsIP(hostResult.IP) {
+		// skip version check for proxy hostnames
+	} else if !ipMatchesIpVersions(hostResult.IP, r.options.IPVersion...) {
 		return
 	}
 
@@ -1197,7 +1199,9 @@ func (r *Runner) handleOutput(scanResults *result.Result) {
 			if err != nil {
 				continue
 			}
-			if !ipMatchesIpVersions(hostIP, r.options.IPVersion...) {
+			if r.options.Proxy != "" && !iputil.IsIP(hostIP) {
+				// skip version check for proxy hostnames
+			} else if !ipMatchesIpVersions(hostIP, r.options.IPVersion...) {
 				continue
 			}
 
