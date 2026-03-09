@@ -49,6 +49,9 @@ func (r *Runner) host2ips(target string) (targetIPsV4 []string, targetIPsV6 []st
 			targetIPsV6 = append(targetIPsV6, dnsData.AAAA...)
 		}
 		if len(targetIPsV4) == 0 && len(targetIPsV6) == 0 {
+			if r.options.Proxy != "" {
+				return []string{target}, nil, nil
+			}
 			return targetIPsV4, targetIPsV6, fmt.Errorf("no IP addresses found for host: %s", target)
 		}
 	} else {

@@ -238,16 +238,24 @@ func (r *Runner) resolveFQDN(target string) ([]string, error) {
 	)
 	for _, ip := range ipsV4 {
 		if !r.scanner.IPRanger.Np.ValidateAddress(ip) {
-			gologger.Warning().Msgf("Skipping host %s as ip %s was excluded\n", target, ip)
-			continue
+			if r.options.Proxy != "" && !iputil.IsIP(ip) {
+				gologger.Debug().Msgf("Skipping network policy validation for %s because it is not an IP and proxy is enabled", ip)
+			} else {
+				gologger.Warning().Msgf("Skipping host %s as ip %s was excluded\n", target, ip)
+				continue
+			}
 		}
 
 		initialHosts = append(initialHosts, ip)
 	}
 	for _, ip := range ipsV6 {
 		if !r.scanner.IPRanger.Np.ValidateAddress(ip) {
-			gologger.Warning().Msgf("Skipping host %s as ip %s was excluded\n", target, ip)
-			continue
+			if r.options.Proxy != "" && !iputil.IsIP(ip) {
+				gologger.Debug().Msgf("Skipping network policy validation for %s because it is not an IP and proxy is enabled", ip)
+			} else {
+				gologger.Warning().Msgf("Skipping host %s as ip %s was excluded\n", target, ip)
+				continue
+			}
 		}
 
 		initialHostsV6 = append(initialHostsV6, ip)

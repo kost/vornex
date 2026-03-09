@@ -637,7 +637,21 @@ func (r *Runner) RunEnumeration(pctx context.Context) error {
 			for _, targetWithPort := range targetsWithPort {
 				ip, p, err := net.SplitHostPort(targetWithPort)
 				if err != nil {
-					gologger.Debug().Msgf("Skipping %s: %v\n", targetWithPort, err)
+					if r.options.Proxy != "" && strings.Contains(err.Error(), "missing port in address") {
+						for _, port := range r.scanner.Ports {
+							if shouldUseRawPackets {
+								r.RawSocketEnumeration(ctx, targetWithPort, port)
+							} else {
+								r.wgscan.Add()
+								go r.handleHostPort(ctx, targetWithPort, payload, port)
+							}
+							if r.options.EnableProgressBar {
+								r.stats.IncrementCounter("packets", 1)
+							}
+						}
+					} else {
+						gologger.Debug().Msgf("Skipping %s: %v\n", targetWithPort, err)
+					}
 					continue
 				}
 
@@ -1058,7 +1072,9 @@ func (r *Runner) handleOutput(scanResults *result.Result) {
 				continue
 			}
 
-			if !ipMatchesIpVersions(hostResult.IP, r.options.IPVersion...) {
+			if r.options.Proxy != "" && !iputil.IsIP(hostResult.IP) {
+				// skip version check for proxy hostnames
+			} else if !ipMatchesIpVersions(hostResult.IP, r.options.IPVersion...) {
 				continue
 			}
 
