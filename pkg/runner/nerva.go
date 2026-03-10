@@ -33,7 +33,11 @@ func (r *Runner) handleServiceFingerprinting() error {
 				Address: joinAddrPort(hostResult.IP, p.Port),
 			}
 			if !target.Address.IsValid() {
-				continue
+				if r.options.Proxy != "" {
+					target.Address = netip.AddrPortFrom(netip.IPv4Unspecified(), uint16(p.Port))
+				} else {
+					continue
+				}
 			}
 
 			switch p.Protocol {
@@ -50,13 +54,18 @@ func (r *Runner) handleServiceFingerprinting() error {
 		return nil
 	}
 
+	proxyURL := r.options.Proxy
+	if proxyURL != "" && !strings.Contains(proxyURL, "://") {
+		proxyURL = "socks5://" + proxyURL
+	}
+
 	timeout := r.options.GetTimeout()
 	gologger.Debug().Msgf("Configuring nerva scan: Timeout=%v, Workers=%v, UDP=%v", timeout, r.options.Threads, false)
 	baseCfg := scan.Config{
 		Workers:        r.options.Threads,
 		DefaultTimeout: timeout,
 		Verbose:        r.options.Verbose || r.options.Debug,
-		Proxy:          r.options.Proxy,
+		Proxy:          proxyURL,
 		ProxyAuth:      r.options.ProxyAuth,
 		DNSOrder:       r.options.DnsOrder,
 	}
@@ -174,13 +183,18 @@ func (r *Runner) enrichHostResultPorts(hostResult *result.HostResult) []*port.Po
 		return hostResult.Ports
 	}
 
+	proxyURL := r.options.Proxy
+	if proxyURL != "" && !strings.Contains(proxyURL, "://") {
+		proxyURL = "socks5://" + proxyURL
+	}
+
 	timeout := r.options.GetTimeout()
 	gologger.Debug().Msgf("Configuring nerva scan (enrich): Timeout=%v, Workers=%v, UDP=%v", timeout, r.options.Threads, false)
 	baseCfg := scan.Config{
 		Workers:        r.options.Threads,
 		DefaultTimeout: timeout,
 		Verbose:        r.options.Verbose || r.options.Debug,
-		Proxy:          r.options.Proxy,
+		Proxy:          proxyURL,
 		ProxyAuth:      r.options.ProxyAuth,
 		DNSOrder:       r.options.DnsOrder,
 	}
@@ -196,7 +210,11 @@ func (r *Runner) enrichHostResultPorts(hostResult *result.HostResult) []*port.Po
 			Address: joinAddrPort(hostResult.IP, p.Port),
 		}
 		if !target.Address.IsValid() {
-			continue
+			if r.options.Proxy != "" {
+				target.Address = netip.AddrPortFrom(netip.IPv4Unspecified(), uint16(p.Port))
+			} else {
+				continue
+			}
 		}
 
 		switch p.Protocol {
@@ -235,7 +253,11 @@ func (r *Runner) enrichHostResultPorts(hostResult *result.HostResult) []*port.Po
 				continue
 			}
 			if ip != hostResult.IP {
-				continue
+				if ip == "0.0.0.0" && r.options.Proxy != "" {
+					ip = hostResult.IP
+				} else {
+					continue
+				}
 			}
 
 			resultsByPort[key(enhancedPort.Protocol, enhancedPort.Port)] = enhancedPort

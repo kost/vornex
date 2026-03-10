@@ -1102,7 +1102,9 @@ func (r *Runner) handleOutput(scanResults *result.Result) {
 					host = hostResult.IP
 				}
 				isCDNIP, cdnName, _ := r.scanner.CdnCheck(hostResult.IP)
-				gologger.Info().Msgf("Found %d ports on host %s (%s)\n", len(hostResult.Ports), host, hostResult.IP)
+				if !(hostResult.IP == "0.0.0.0" && r.options.Proxy != "") {
+					gologger.Info().Msgf("Found %d ports on host %s (%s)\n", len(hostResult.Ports), host, hostResult.IP)
+				}
 
 				// console output
 				if r.options.JSON || r.options.CSV {
