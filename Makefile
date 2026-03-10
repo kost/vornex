@@ -24,13 +24,21 @@ PLATFORMS := \
 	freebsd/arm \
 	freebsd/arm64
 
-.PHONY: all clean dist
+.PHONY: all clean dist distdyn diststatic
 
 all: build
 build:
 	$(GOBUILD) $(GOFLAGS) -ldflags '$(LDFLAGS)' -o "naabu" $(SRC)
 
-dist:
+build-static:
+	$(GOBUILD) $(GOFLAGS) -tags nopcap -ldflags '$(LDFLAGS) -extldflags "-static"' -o "naabu" $(SRC)
+
+build-nopcap:
+	$(GOBUILD) $(GOFLAGS) -tags nopcap -ldflags '$(LDFLAGS)' -o "naabu" $(SRC)
+
+dist: distdyn diststatic
+
+distdyn:
 	@mkdir -p $(BUILD_DIR)
 	@for platform in $(PLATFORMS); do \
 		GOOS=$${platform%/*}; \
@@ -38,7 +46,18 @@ dist:
 		output="$(BUILD_DIR)/$(APP_NAME)-$$GOOS-$$GOARCH"; \
 		if [ "$$GOOS" = "windows" ]; then output="$$output.exe"; fi; \
 		echo "Building $$output"; \
-		CGO_ENABLED=0 GOOS=$$GOOS GOARCH=$$GOARCH go build -trimpath -ldflags '$(LDFLAGS)' -tags netgo,osusergo,static_build -o $$output $(SRC); \
+		CGO_ENABLED=0 GOOS=$$GOOS GOARCH=$$GOARCH go build -trimpath -ldflags '$(LDFLAGS)' -o $$output $(SRC); \
+	done
+
+diststatic:
+	@mkdir -p $(BUILD_DIR)
+	@for platform in $(PLATFORMS); do \
+		GOOS=$${platform%/*}; \
+		GOARCH=$${platform#*/}; \
+		output="$(BUILD_DIR)/$(APP_NAME)-static-$$GOOS-$$GOARCH"; \
+		if [ "$$GOOS" = "windows" ]; then output="$$output.exe"; fi; \
+		echo "Building $$output"; \
+		CGO_ENABLED=0 GOOS=$$GOOS GOARCH=$$GOARCH go build -trimpath -ldflags '$(LDFLAGS)' -tags netgo,osusergo,static_build,nopcap -o $$output $(SRC); \
 	done
 
 test:
