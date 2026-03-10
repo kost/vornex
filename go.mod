@@ -143,4 +143,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
 
-replace github.com/praetorian-inc/nerva => github.com/kost/nerva v0.0.0-20260308061756-0271cf6932b6
+replace github.com/praetorian-inc/nerva => github.com/kost/nerva v0.0.0-20260310004614-825fb9f11a10

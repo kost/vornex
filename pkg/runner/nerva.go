@@ -50,8 +50,11 @@ func (r *Runner) handleServiceFingerprinting() error {
 		return nil
 	}
 
+	timeout := r.options.GetTimeout()
+	gologger.Debug().Msgf("Configuring nerva scan: Timeout=%v, Workers=%v, UDP=%v", timeout, r.options.Threads, false)
 	baseCfg := scan.Config{
-		DefaultTimeout: r.options.Timeout,
+		Workers:        r.options.Threads,
+		DefaultTimeout: timeout,
 		Verbose:        r.options.Verbose || r.options.Debug,
 		Proxy:          r.options.Proxy,
 		ProxyAuth:      r.options.ProxyAuth,
@@ -171,8 +174,11 @@ func (r *Runner) enrichHostResultPorts(hostResult *result.HostResult) []*port.Po
 		return hostResult.Ports
 	}
 
+	timeout := r.options.GetTimeout()
+	gologger.Debug().Msgf("Configuring nerva scan (enrich): Timeout=%v, Workers=%v, UDP=%v", timeout, r.options.Threads, false)
 	baseCfg := scan.Config{
-		DefaultTimeout: r.options.Timeout,
+		Workers:        r.options.Threads,
+		DefaultTimeout: timeout,
 		Verbose:        r.options.Verbose || r.options.Debug,
 		Proxy:          r.options.Proxy,
 		ProxyAuth:      r.options.ProxyAuth,
