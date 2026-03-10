@@ -12,13 +12,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestHandleServiceFingerprinting_Disabled(t *testing.T) {
-	r := &Runner{
-		options: &Options{},
-	}
-
-	require.NoError(t, r.handleServiceFingerprinting())
-}
 
 func TestIntegrateNervaResults_ServiceDiscoveryOnly(t *testing.T) {
 	r := &Runner{

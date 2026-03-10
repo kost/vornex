@@ -16,86 +16,6 @@ import (
 	"github.com/projectdiscovery/naabu/v2/pkg/result"
 )
 
-func (r *Runner) handleServiceFingerprinting() error {
-	if !r.options.ServiceDiscovery && !r.options.ServiceVersion {
-		return nil
-	}
-
-	var tcpTargets, udpTargets []plugins.Target
-	for hostResult := range r.scanner.ScanResults.GetIPsPorts() {
-		for _, p := range hostResult.Ports {
-			if p.Port <= 0 || p.Port > 65535 {
-				continue
-			}
-
-			target := plugins.Target{
-				Host:    hostResult.IP,
-				Address: joinAddrPort(hostResult.IP, p.Port),
-			}
-			if !target.Address.IsValid() {
-				if r.options.Proxy != "" {
-					target.Address = netip.AddrPortFrom(netip.IPv4Unspecified(), uint16(p.Port))
-				} else {
-					continue
-				}
-			}
-
-			switch p.Protocol {
-			case protocol.UDP:
-				udpTargets = append(udpTargets, target)
-			default:
-				tcpTargets = append(tcpTargets, target)
-			}
-		}
-	}
-
-	if len(tcpTargets) == 0 && len(udpTargets) == 0 {
-		// gologger.Info().Msg("No hosts with open ports found for service fingerprinting")
-		return nil
-	}
-
-	proxyURL := r.options.Proxy
-	if proxyURL != "" && !strings.Contains(proxyURL, "://") {
-		proxyURL = "socks5://" + proxyURL
-	}
-
-	timeout := r.options.GetTimeout()
-	gologger.Debug().Msgf("Configuring nerva scan: Timeout=%v, Workers=%v, UDP=%v", timeout, r.options.Threads, false)
-	baseCfg := scan.Config{
-		Workers:        r.options.Threads,
-		DefaultTimeout: timeout,
-		Verbose:        r.options.Verbose || r.options.Debug,
-		Proxy:          proxyURL,
-		ProxyAuth:      r.options.ProxyAuth,
-		DNSOrder:       r.options.DnsOrder,
-	}
-
-	run := func(targets []plugins.Target, udp bool) {
-		if len(targets) == 0 {
-			return
-		}
-
-		cfg := baseCfg
-		cfg.UDP = udp
-
-		results, err := scan.ScanTargets(context.Background(), targets, cfg)
-		if err != nil {
-			transport := "tcp"
-			if udp {
-				transport = "udp"
-			}
-			gologger.Warning().Msgf("Could not fingerprint %s services: %s", transport, err)
-			return
-		}
-
-		r.integrateNervaResults(results)
-	}
-
-	run(tcpTargets, false)
-	run(udpTargets, true)
-
-	return nil
-}
 
 func joinAddrPort(ip string, portNum int) netip.AddrPort {
 	addr, err := netip.ParseAddr(ip)
@@ -279,14 +199,3 @@ func (r *Runner) enrichHostResultPorts(hostResult *result.HostResult) []*port.Po
 	return hostResult.Ports
 }
 
-func (r *Runner) handleFingerprinting() error {
-	if err := r.handleServiceFingerprinting(); err != nil {
-		return err
-	}
-
-	if err := r.handleNmap(); err != nil {
-		return err
-	}
-
-	return nil
-}

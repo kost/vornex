@@ -442,7 +442,7 @@ func (r *Runner) RunEnumeration(pctx context.Context) error {
 
 		time.Sleep(time.Duration(r.options.WarmUpTime) * time.Second)
 
-		if err := r.handleFingerprinting(); err != nil {
+		if err := r.handleNmap(); err != nil {
 			return err
 		}
 
@@ -520,7 +520,7 @@ func (r *Runner) RunEnumeration(pctx context.Context) error {
 			r.ConnectVerification()
 		}
 
-		if err := r.handleFingerprinting(); err != nil {
+		if err := r.handleNmap(); err != nil {
 			return err
 		}
 
@@ -707,8 +707,8 @@ func (r *Runner) RunEnumeration(pctx context.Context) error {
 			r.ConnectVerification()
 		}
 
-		// handle fingerprinting first to integrate service information
-		if err := r.handleFingerprinting(); err != nil {
+		// then handle output with enhanced service information
+		if err := r.handleNmap(); err != nil {
 			return err
 		}
 
