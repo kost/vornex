@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/miekg/dns"
-	"github.com/projectdiscovery/naabu/v2/pkg/port"
-	"github.com/projectdiscovery/naabu/v2/pkg/protocol"
-	"github.com/projectdiscovery/naabu/v2/pkg/result"
-	"github.com/projectdiscovery/naabu/v2/pkg/scan"
+	"github.com/kost/vornex/v2/pkg/port"
+	"github.com/kost/vornex/v2/pkg/protocol"
+	"github.com/kost/vornex/v2/pkg/result"
+	"github.com/kost/vornex/v2/pkg/scan"
 	"github.com/projectdiscovery/ratelimit"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -211,7 +211,7 @@ func TestRunnerClose(t *testing.T) {
 	require.NoError(t, err)
 	require.NotNil(t, runner)
 
-	tmpfile, err := os.CreateTemp("", "naabu-test")
+	tmpfile, err := os.CreateTemp("", "vornex-test")
 	require.NoError(t, err)
 	require.NoError(t, tmpfile.Close())
 	defer func() {
@@ -910,7 +910,7 @@ func TestConcurrentSYNScans(t *testing.T) {
 				Silent:   true,
 			}
 
-			naabuRunner, err := NewRunner(options)
+			vornexRunner, err := NewRunner(options)
 			if err != nil {
 				t.Logf("Error creating runner for %s: %v", target, err)
 				errChan <- fmt.Errorf("runner creation failed for %s: %w", target, err)
@@ -918,13 +918,13 @@ func TestConcurrentSYNScans(t *testing.T) {
 			}
 
 			defer func() {
-				closeErr := naabuRunner.Close()
+				closeErr := vornexRunner.Close()
 				if closeErr != nil {
 					t.Logf("Error closing runner for %s: %v", target, closeErr)
 				}
 			}()
 
-			runErr := naabuRunner.RunEnumeration(ctx)
+			runErr := vornexRunner.RunEnumeration(ctx)
 			if runErr != nil {
 				errChan <- fmt.Errorf("enumeration failed for %s: %w", target, runErr)
 			}

@@ -6,9 +6,9 @@ import (
 	"path/filepath"
 	"time"
 
-	"github.com/projectdiscovery/naabu/v2/pkg/privileges"
-	"github.com/projectdiscovery/naabu/v2/pkg/result"
-	"github.com/projectdiscovery/naabu/v2/pkg/scan"
+	"github.com/kost/vornex/v2/pkg/privileges"
+	"github.com/kost/vornex/v2/pkg/result"
+	"github.com/kost/vornex/v2/pkg/scan"
 	"github.com/projectdiscovery/networkpolicy"
 	"github.com/projectdiscovery/utils/env"
 	fileutil "github.com/projectdiscovery/utils/file"
@@ -132,7 +132,7 @@ type Options struct {
 	AssetName string
 	// AssetFileUpload for projectdiscovery cloud
 	AssetFileUpload string
-	// OnClose adds a callback function that is invoked when naabu is closed
+	// OnClose adds a callback function that is invoked when vornex is closed
 	// to be exact at end of existing closures
 	OnClose func()
 }
@@ -143,7 +143,7 @@ func ParseOptions() *Options {
 	var cfgFile string
 
 	flagSet := goflags.NewFlagSet()
-	flagSet.SetDescription(`Naabu is a port scanning tool written in Go that allows you to enumerate open ports for hosts in a fast and reliable manner.`)
+	flagSet.SetDescription(`Vornex is a port scanning tool written in Go that allows you to enumerate open ports for hosts in a fast and reliable manner.`)
 
 	flagSet.CreateGroup("input", "Input",
 		flagSet.StringSliceVarP(&options.Host, "host", "", nil, "hosts to scan ports for (comma-separated)", goflags.NormalizedStringSliceOptions),
@@ -168,8 +168,8 @@ func ParseOptions() *Options {
 	)
 
 	flagSet.CreateGroup("update", "Update",
-		flagSet.CallbackVarP(GetUpdateCallback(), "update", "up", "update naabu to latest version"),
-		flagSet.BoolVarP(&options.DisableUpdateCheck, "disable-update-check", "duc", false, "disable automatic naabu update check"),
+		flagSet.CallbackVarP(GetUpdateCallback(), "update", "up", "update vornex to latest version"),
+		flagSet.BoolVarP(&options.DisableUpdateCheck, "disable-update-check", "duc", false, "disable automatic vornex update check"),
 	)
 
 	flagSet.CreateGroup("output", "Output",
@@ -181,7 +181,7 @@ func ParseOptions() *Options {
 	)
 
 	flagSet.CreateGroup("config", "Configuration",
-		flagSet.StringVar(&cfgFile, "config", "", "path to the naabu configuration file (default $HOME/.config/naabu/config.yaml)"),
+		flagSet.StringVar(&cfgFile, "config", "", "path to the vornex configuration file (default $HOME/.config/vornex/config.yaml)"),
 		flagSet.BoolVarP(&options.ScanAllIPS, "sa", "scan-all-ips", false, "scan all the IP's associated with DNS record"),
 		flagSet.StringSliceVarP(&options.IPVersion, "iv", "ip-version", []string{scan.IPv4, scan.IPv6}, "ip version to scan of hostname (4,6) - (default 4,6)", goflags.NormalizedStringSliceOptions),
 		flagSet.StringVarP(&options.ScanType, "s", "scan-type", ConnectScan, "type of port scan (SYN/CONNECT)"),
@@ -241,10 +241,10 @@ func ParseOptions() *Options {
 		flagSet.BoolVarP(&options.Verbose, "v", "verbose", false, "display verbose output"),
 		flagSet.BoolVarP(&options.NoColor, "nc", "no-color", false, "disable colors in CLI output"),
 		flagSet.BoolVar(&options.Silent, "silent", false, "display only results in output"),
-		flagSet.BoolVar(&options.Version, "version", false, "display version of naabu"),
+		flagSet.BoolVar(&options.Version, "version", false, "display version of vornex"),
 		flagSet.BoolVar(&options.EnableProgressBar, "stats", false, "display stats of the running scan (deprecated)"),
 		flagSet.IntVarP(&options.StatsInterval, "stats-interval", "si", DefautStatsInterval, "number of seconds to wait between showing a statistics update (deprecated)"),
-		flagSet.IntVarP(&options.MetricsPort, "metrics-port", "mp", 63636, "port to expose naabu metrics on"),
+		flagSet.IntVarP(&options.MetricsPort, "metrics-port", "mp", 63636, "port to expose vornex metrics on"),
 	)
 
 	flagSet.CreateGroup("cloud", "Cloud",
@@ -254,7 +254,7 @@ func ParseOptions() *Options {
 		flagSet.StringVarP(&options.TeamID, "team-id", "tid", TeamIDEnv, "upload asset results to given team id (optional)"),
 		flagSet.StringVarP(&options.AssetID, "asset-id", "aid", "", "upload new assets to existing asset id (optional)"),
 		flagSet.StringVarP(&options.AssetName, "asset-name", "aname", "", "assets group name to set (optional)"),
-		flagSet.StringVarP(&options.AssetFileUpload, "dashboard-upload", "pdu", "", "upload naabu output file (jsonl) in projectdiscovery cloud (pdcp) UI dashboard"),
+		flagSet.StringVarP(&options.AssetFileUpload, "dashboard-upload", "pdu", "", "upload vornex output file (jsonl) in projectdiscovery cloud (pdcp) UI dashboard"),
 	)
 
 	_ = flagSet.Parse()
@@ -293,7 +293,7 @@ func ParseOptions() *Options {
 		ph := pdcpauth.PDCPCredHandler{}
 		if _, err := ph.GetCreds(); err == pdcpauth.ErrNoCreds {
 			apiServer := env.GetEnvOrDefault("PDCP_API_SERVER", pdcpauth.DefaultApiServer)
-			if validatedCreds, err := ph.ValidateAPIKey(PDCPApiKey, apiServer, "naabu"); err == nil {
+			if validatedCreds, err := ph.ValidateAPIKey(PDCPApiKey, apiServer, "vornex"); err == nil {
 				_ = ph.SaveCreds(validatedCreds)
 			}
 		}
@@ -327,11 +327,11 @@ func ParseOptions() *Options {
 	}
 
 	if !options.DisableUpdateCheck {
-		latestVersion, err := updateutils.GetToolVersionCallback("naabu", Version)()
+		latestVersion, err := updateutils.GetToolVersionCallback("vornex", Version)()
 		if err != nil {
-			gologger.Verbose().Msgf("naabu version check failed: %v", err.Error())
+			gologger.Verbose().Msgf("vornex version check failed: %v", err.Error())
 		} else {
-			gologger.Info().Msgf("Current naabu version %v %v", Version, updateutils.GetVersionDescription(Version, latestVersion))
+			gologger.Info().Msgf("Current vornex version %v %v", Version, updateutils.GetVersionDescription(Version, latestVersion))
 		}
 	}
 

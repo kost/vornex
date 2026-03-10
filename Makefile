@@ -6,8 +6,8 @@ GOTEST=$(GOCMD) test
 GOFLAGS := -v 
 LDFLAGS := -s -w
 
-APP_NAME := naabu
-SRC := ./cmd/naabu
+APP_NAME := vornex
+SRC := ./cmd/vornex
 BUILD_DIR := dist
 
 PLATFORMS := \
@@ -28,13 +28,13 @@ PLATFORMS := \
 
 all: build
 build:
-	$(GOBUILD) $(GOFLAGS) -ldflags '$(LDFLAGS)' -o "naabu" $(SRC)
+	$(GOBUILD) $(GOFLAGS) -ldflags '$(LDFLAGS)' -o "vornex" $(SRC)
 
 build-static:
-	$(GOBUILD) $(GOFLAGS) -tags nopcap -ldflags '$(LDFLAGS) -extldflags "-static"' -o "naabu" $(SRC)
+	$(GOBUILD) $(GOFLAGS) -tags nopcap -ldflags '$(LDFLAGS) -extldflags "-static"' -o "vornex" $(SRC)
 
 build-nopcap:
-	$(GOBUILD) $(GOFLAGS) -tags nopcap -ldflags '$(LDFLAGS)' -o "naabu" $(SRC)
+	$(GOBUILD) $(GOFLAGS) -tags nopcap -ldflags '$(LDFLAGS)' -o "vornex" $(SRC)
 
 dist: distdyn diststatic
 

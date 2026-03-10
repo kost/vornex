@@ -4,10 +4,10 @@ import (
 	"testing"
 
 	"github.com/praetorian-inc/nerva/pkg/plugins"
-	"github.com/projectdiscovery/naabu/v2/pkg/port"
-	"github.com/projectdiscovery/naabu/v2/pkg/protocol"
-	"github.com/projectdiscovery/naabu/v2/pkg/result"
-	"github.com/projectdiscovery/naabu/v2/pkg/scan"
+	"github.com/kost/vornex/v2/pkg/port"
+	"github.com/kost/vornex/v2/pkg/protocol"
+	"github.com/kost/vornex/v2/pkg/result"
+	"github.com/kost/vornex/v2/pkg/scan"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )

@@ -1,13 +1,13 @@
 blank_issues_enabled: false
 
 contact_links:
-  - name: Ask an question / advise on using naabu
-    url: https://github.com/projectdiscovery/naabu/discussions/categories/q-a
-    about: Ask a question or request support for using naabu
+  - name: Ask an question / advise on using vornex
+    url: https://github.com/kost/vornex/discussions/categories/q-a
+    about: Ask a question or request support for using vornex
 
-  - name: Share idea / feature to discuss for naabu
-    url: https://github.com/projectdiscovery/naabu/discussions/categories/ideas
-    about: Share idea / feature to discuss for naabu
+  - name: Share idea / feature to discuss for vornex
+    url: https://github.com/kost/vornex/discussions/categories/ideas
+    about: Share idea / feature to discuss for vornex
 
   - name: Connect with PD Team (Discord)
     url: https://discord.gg/projectdiscovery

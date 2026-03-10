@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/naabu/v2/pkg/scan"
+	"github.com/kost/vornex/v2/pkg/scan"
 	"github.com/projectdiscovery/retryabledns"
 	iputil "github.com/projectdiscovery/utils/ip"
 	osutil "github.com/projectdiscovery/utils/os"

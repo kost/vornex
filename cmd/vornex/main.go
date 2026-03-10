@@ -10,11 +10,11 @@ import (
 	"github.com/logrusorgru/aurora"
 	_ "github.com/projectdiscovery/fdmax/autofdmax"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/naabu/v2/internal/pdcp"
-	"github.com/projectdiscovery/naabu/v2/pkg/port"
-	"github.com/projectdiscovery/naabu/v2/pkg/protocol"
-	"github.com/projectdiscovery/naabu/v2/pkg/result"
-	"github.com/projectdiscovery/naabu/v2/pkg/runner"
+	"github.com/kost/vornex/v2/internal/pdcp"
+	"github.com/kost/vornex/v2/pkg/port"
+	"github.com/kost/vornex/v2/pkg/protocol"
+	"github.com/kost/vornex/v2/pkg/result"
+	"github.com/kost/vornex/v2/pkg/runner"
 	pdcpauth "github.com/projectdiscovery/utils/auth/pdcp"
 )
 
@@ -78,7 +78,7 @@ func main() {
 	// setup optional asset upload
 	_ = setupOptionalAssetUpload(options)
 
-	naabuRunner, err := runner.NewRunner(options)
+	vornexRunner, err := runner.NewRunner(options)
 	if err != nil {
 		gologger.Fatal().Msgf("Could not create runner: %s\n", err)
 	}
@@ -113,10 +113,10 @@ func main() {
 				}
 
 				// Show scan result if runner is available
-				if naabuRunner != nil {
-					naabuRunner.ShowScanResultOnExit()
+				if vornexRunner != nil {
+					vornexRunner.ShowScanResultOnExit()
 
-					if err := naabuRunner.Close(); err != nil {
+					if err := vornexRunner.Close(); err != nil {
 						gologger.Error().Msgf("Couldn't close runner: %s\n", err)
 					}
 				}
@@ -127,12 +127,12 @@ func main() {
 	}()
 
 	// Start enumeration
-	if err := naabuRunner.RunEnumeration(ctx); err != nil {
+	if err := vornexRunner.RunEnumeration(ctx); err != nil {
 		gologger.Fatal().Msgf("Could not run enumeration: %s\n", err)
 	}
 
 	defer func() {
-		if err := naabuRunner.Close(); err != nil {
+		if err := vornexRunner.Close(); err != nil {
 			gologger.Error().Msgf("Couldn't close runner: %s\n", err)
 		}
 		// On successful execution, cleanup resume config if needed
@@ -165,7 +165,7 @@ func setupOptionalAssetUpload(opts *runner.Options) *pdcp.UploadWriter {
 		if err != pdcpauth.ErrNoCreds && !pdcp.HideAutoSaveMsg {
 			gologger.Verbose().Msgf("Could not get credentials for cloud upload: %s\n", err)
 		}
-		pdcpauth.CheckNValidateCredentials("naabu")
+		pdcpauth.CheckNValidateCredentials("vornex")
 		return nil
 	}
 	writer, err := pdcp.NewUploadWriterCallback(context.Background(), creds)

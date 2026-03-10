@@ -7,9 +7,9 @@ import (
 
 	"github.com/Ullaakut/nmap/v3"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/naabu/v2/pkg/port"
-	"github.com/projectdiscovery/naabu/v2/pkg/protocol"
-	"github.com/projectdiscovery/naabu/v2/pkg/result"
+	"github.com/kost/vornex/v2/pkg/port"
+	"github.com/kost/vornex/v2/pkg/protocol"
+	"github.com/kost/vornex/v2/pkg/result"
 )
 
 func (r *Runner) handleNmap() error {
@@ -144,7 +144,7 @@ func (r *Runner) handleNmap() error {
 			}
 		}
 
-		// Process and integrate results back into naabu scan results
+		// Process and integrate results back into vornex scan results
 		r.integrateNmapResults(result)
 	}
 
@@ -175,7 +175,7 @@ func nmapOS2Fingerprint(host nmap.Host) *result.OSFingerprint {
 	return osfp
 }
 
-// integrateNmapResults processes nmap results and integrates them back into naabu scan results
+// integrateNmapResults processes nmap results and integrates them back into vornex scan results
 func (r *Runner) integrateNmapResults(nmapResult *nmap.Run) {
 	if nmapResult == nil || len(nmapResult.Hosts) == 0 {
 		gologger.Info().Msg("No nmap results to integrate")
@@ -194,26 +194,26 @@ func (r *Runner) integrateNmapResults(nmapResult *nmap.Run) {
 
 		for _, nmapPort := range host.Ports {
 			if nmapPort.State.State == "open" {
-				// Convert nmap port to naabu port with enhanced service information
-				naabuPort := r.convertNmapPortToNaabuPort(nmapPort)
+				// Convert nmap port to vornex port with enhanced service information
+				vornexPort := r.convertNmapPortToVornexPort(nmapPort)
 
 				// Update the existing port in scan results with enhanced service information
-				r.updatePortWithServiceInfo(ip, naabuPort)
+				r.updatePortWithServiceInfo(ip, vornexPort)
 
 				// Log the enhanced information
 				serviceInfo := ""
-				if naabuPort.Service != nil && naabuPort.Service.Name != "" {
-					serviceInfo = fmt.Sprintf(" (%s", naabuPort.Service.Name)
-					if naabuPort.Service.Version != "" {
-						serviceInfo += fmt.Sprintf(" %s", naabuPort.Service.Version)
+				if vornexPort.Service != nil && vornexPort.Service.Name != "" {
+					serviceInfo = fmt.Sprintf(" (%s", vornexPort.Service.Name)
+					if vornexPort.Service.Version != "" {
+						serviceInfo += fmt.Sprintf(" %s", vornexPort.Service.Version)
 					}
-					if naabuPort.Service.Product != "" {
-						serviceInfo += fmt.Sprintf(" %s", naabuPort.Service.Product)
+					if vornexPort.Service.Product != "" {
+						serviceInfo += fmt.Sprintf(" %s", vornexPort.Service.Product)
 					}
 					serviceInfo += ")"
 				}
 
-				gologger.Silent().Msgf("  %d/%s%s", naabuPort.Port, naabuPort.Protocol, serviceInfo)
+				gologger.Silent().Msgf("  %d/%s%s", vornexPort.Port, vornexPort.Protocol, serviceInfo)
 			}
 		}
 
@@ -246,8 +246,8 @@ func (r *Runner) updatePortWithServiceInfo(ip string, enhancedPort *port.Port) {
 	}
 }
 
-// convertNmapPortToNaabuPort converts an nmap port to a naabu port with service information
-func (r *Runner) convertNmapPortToNaabuPort(nmapPort nmap.Port) *port.Port {
+// convertNmapPortToVornexPort converts an nmap port to a vornex port with service information
+func (r *Runner) convertNmapPortToVornexPort(nmapPort nmap.Port) *port.Port {
 	// Determine protocol
 	var proto protocol.Protocol
 	switch nmapPort.Protocol {
@@ -259,8 +259,8 @@ func (r *Runner) convertNmapPortToNaabuPort(nmapPort nmap.Port) *port.Port {
 		proto = protocol.TCP // default to TCP
 	}
 
-	// Create naabu port
-	naabuPort := &port.Port{
+	// Create vornex port
+	vornexPort := &port.Port{
 		Port:     int(nmapPort.ID), // Convert uint16 to int
 		Protocol: proto,
 	}
@@ -272,7 +272,7 @@ func (r *Runner) convertNmapPortToNaabuPort(nmapPort nmap.Port) *port.Port {
 			cpes = append(cpes, string(cpe))
 		}
 
-		naabuPort.Service = &port.Service{
+		vornexPort.Service = &port.Service{
 			Name:        nmapPort.Service.Name,
 			Product:     nmapPort.Service.Product,
 			Version:     nmapPort.Service.Version,
@@ -291,5 +291,5 @@ func (r *Runner) convertNmapPortToNaabuPort(nmapPort nmap.Port) *port.Port {
 		}
 	}
 
-	return naabuPort
+	return vornexPort
 }

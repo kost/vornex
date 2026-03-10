@@ -5,27 +5,27 @@ import (
 	"strings"
 
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/naabu/v2/pkg/privileges"
-	"github.com/projectdiscovery/naabu/v2/pkg/scan"
+	"github.com/kost/vornex/v2/pkg/privileges"
+	"github.com/kost/vornex/v2/pkg/scan"
 	"github.com/projectdiscovery/utils/auth/pdcp"
 	osutil "github.com/projectdiscovery/utils/os"
 	updateutils "github.com/projectdiscovery/utils/update"
 )
 
 const banner = `
-                  __
-  ___  ___  ___ _/ /  __ __
- / _ \/ _ \/ _ \/ _ \/ // /
-/_//_/\_,_/\_,_/_.__/\_,_/
+                   __ 
+ _  _____  _______/ /__ __
+| |/ / _ \/ __/ _ \// -_) \ /
+|___/\___/_/ /_//_/\__/_\_\
 `
 
-// Version is the current Version of naabu
+// Version is the current Version of vornex
 const Version = `2.5.0`
 
 // showBanner is used to show the banner to the user
 func showBanner() {
 	gologger.Print().Msgf("%s\n", banner)
-	gologger.Print().Msgf("\t\tprojectdiscovery.io\n\n")
+	gologger.Print().Msgf("\tgithub.com/kost/vornex - based on naabu and nerva\n\n")
 }
 
 // showNetworkCapabilities shows the network capabilities/scan types possible with the running user
@@ -91,16 +91,16 @@ func showNetworkInterfaces() error {
 	return nil
 }
 
-// GetUpdateCallback returns a callback function that updates naabu
+// GetUpdateCallback returns a callback function that updates vornex
 func GetUpdateCallback() func() {
 	return func() {
 		showBanner()
-		updateutils.GetUpdateToolCallback("naabu", Version)()
+		updateutils.GetUpdateToolCallback("vornex", Version)()
 	}
 }
 
 // AuthWithPDCP is used to authenticate with PDCP
 func AuthWithPDCP() {
 	showBanner()
-	pdcp.CheckNValidateCredentials("naabu")
+	pdcp.CheckNValidateCredentials("vornex")
 }

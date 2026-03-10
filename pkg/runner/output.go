@@ -16,8 +16,8 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/naabu/v2/pkg/port"
-	"github.com/projectdiscovery/naabu/v2/pkg/protocol"
+	"github.com/kost/vornex/v2/pkg/port"
+	"github.com/kost/vornex/v2/pkg/protocol"
 	"github.com/projectdiscovery/utils/structs"
 )
 

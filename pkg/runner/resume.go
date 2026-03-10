@@ -20,7 +20,7 @@ func DefaultResumeFolderPath() string {
 	if err != nil {
 		return defaultResumeFileName
 	}
-	return filepath.Join(home, ".config", "naabu")
+	return filepath.Join(home, ".config", "vornex")
 }
 
 // DefaultResumeFilePath returns the default resume file full path

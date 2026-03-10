@@ -1,13 +1,13 @@
 <h1 align="center">
-  <img src="static/naabu-logo.png" alt="naabu" width="200px">
+  <img src="static/vornex-logo.png" alt="vornex" width="200px">
   <br>
 </h1>
 
 <p align="center">
 <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/license-MIT-_red.svg"></a>
-<a href="https://github.com/projectdiscovery/naabu/issues"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"></a>
-<a href="https://goreportcard.com/badge/github.com/projectdiscovery/naabu"><img src="https://goreportcard.com/badge/github.com/projectdiscovery/naabu"></a>
-<a href="https://github.com/projectdiscovery/naabu/releases"><img src="https://img.shields.io/github/release/projectdiscovery/naabu"></a>
+<a href="https://github.com/kost/vornex/issues"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"></a>
+<a href="https://goreportcard.com/badge/github.com/kost/vornex"><img src="https://goreportcard.com/badge/github.com/kost/vornex"></a>
+<a href="https://github.com/kost/vornex/releases"><img src="https://img.shields.io/github/release/projectdiscovery/vornex"></a>
 <a href="https://twitter.com/pdiscoveryio"><img src="https://img.shields.io/twitter/follow/pdiscoveryio.svg?logo=twitter"></a>
 <a href="https://discord.gg/projectdiscovery"><img src="https://img.shields.io/discord/695645237418131507.svg?logo=discord"></a>
 </p>
@@ -16,20 +16,20 @@
   <a href="#features">Features</a> •
   <a href="#installation-instructions">Installation</a> •
   <a href="#usage">Usage</a> •
-  <a href="#running-naabu">Running naabu</a> •
+  <a href="#running-vornex">Running vornex</a> •
   <a href="#configuration-file">Config</a> •
   <a href="#nmap-integration">NMAP integration</a> •
   <a href="#cdn-waf-exclusion">CDN/WAF Exclusion</a> •
   <a href="https://discord.gg/projectdiscovery">Discord</a>
 </p>
 
-Naabu is a port scanning tool written in Go that allows you to enumerate valid ports for hosts in a fast and reliable manner. It is a really simple tool that does fast SYN/CONNECT/UDP scans on the host/list of hosts and lists
+Vornex is a port scanning tool written in Go that allows you to enumerate valid ports for hosts in a fast and reliable manner. It is a really simple tool that does fast SYN/CONNECT/UDP scans on the host/list of hosts and lists
 all ports that return a reply.
 
 # Features
 
 <h1 align="center">
-  <img src="https://user-images.githubusercontent.com/8293321/180417395-25b1b990-c032-4b5c-9b66-03b58db0789a.png" alt="naabu" width="700px">
+  <img src="https://user-images.githubusercontent.com/8293321/180417395-25b1b990-c032-4b5c-9b66-03b58db0789a.png" alt="vornex" width="700px">
   <br>
 </h1>
 
@@ -48,14 +48,14 @@ all ports that return a reply.
 # Usage
 
 ```sh
-naabu -h
+vornex -h
 ```
 
 This will display help for the tool. Here are all the switches it supports.
 
 ```yaml
 Usage:
-  naabu [flags]
+  vornex [flags]
 
 Flags:
 INPUT:
@@ -78,8 +78,8 @@ RATE-LIMIT:
    -rate int  packets to send per second (default 1000)
 
 UPDATE:
-   -up, -update                 update naabu to latest version
-   -duc, -disable-update-check  disable automatic naabu update check
+   -up, -update                 update vornex to latest version
+   -duc, -disable-update-check  disable automatic vornex update check
 
 OUTPUT:
    -o, -output string  file to write output to (optional)
@@ -87,7 +87,7 @@ OUTPUT:
    -csv                write output in csv format
 
 CONFIGURATION:
-   -config string                   path to the naabu configuration file (default $HOME/.config/naabu/config.yaml)
+   -config string                   path to the vornex configuration file (default $HOME/.config/vornex/config.yaml)
    -scan-all-ips, -sa               scan all the IP's associated with DNS record
    -ip-version, -iv string[]        ip version to scan of hostname (4,6) - (default 4,6) (default ["4","6"])
    -scan-type, -s string            type of port scan (SYN/CONNECT) (default "c")
@@ -132,10 +132,10 @@ DEBUG:
    -verbose, -v              display verbose output
    -no-color, -nc            disable colors in CLI output
    -silent                   display only results in output
-   -version                  display version of naabu
+   -version                  display version of vornex
    -stats                    display stats of the running scan (deprecated)
    -si, -stats-interval int  number of seconds to wait between showing a statistics update (deprecated) (default 5)
-   -mp, -metrics-port int    port to expose naabu metrics on (default 63636)
+   -mp, -metrics-port int    port to expose vornex metrics on (default 63636)
 
 CLOUD:
    -auth                           configure projectdiscovery cloud (pdcp) api key (default true)
@@ -144,37 +144,37 @@ CLOUD:
    -tid, -team-id string           upload asset results to given team id (optional)
    -aid, -asset-id string          upload new assets to existing asset id (optional)
    -aname, -asset-name string      assets group name to set (optional)
-   -pdu, -dashboard-upload string  upload naabu output file (jsonl) in projectdiscovery cloud (pdcp) UI dashboard
+   -pdu, -dashboard-upload string  upload vornex output file (jsonl) in projectdiscovery cloud (pdcp) UI dashboard
 ```
 
 # Installation Instructions
 
-Download the ready to run [binary](https://github.com/projectdiscovery/naabu/releases/) / [docker](https://hub.docker.com/r/projectdiscovery/naabu) or install with GO
+Download the ready to run [binary](https://github.com/kost/vornex/releases/) / [docker](https://hub.docker.com/r/projectdiscovery/vornex) or install with GO
 
 ## Prerequisite
 
-> **Note**: before installing naabu, make sure to install `libpcap` library for packet capturing.
+> **Note**: before installing vornex, make sure to install `libpcap` library for packet capturing.
 
 To install libcap on **Linux**: `sudo apt install -y libpcap-dev`, on **Mac**: `brew install libpcap`
 
 
-## Installing Naabu
+## Installing Vornex
 
 ```sh
-go install -v github.com/projectdiscovery/naabu/v2/cmd/naabu@latest
+go install -v github.com/kost/vornex/v2/cmd/vornex@latest
 ```
 
-# Running Naabu
+# Running Vornex
 
 To run the tool on a target, just use the following command.
 ```sh
-naabu -host hackerone.com
+vornex -host hackerone.com
 ```
 
 This will run the tool against hackerone.com. There are a number of configuration options that you can pass along with this command. The verbose switch `-v` can be used to display verbose information.
 
 ```console
-naabu -host hackerone.com
+vornex -host hackerone.com
 
                   __
   ___  ___  ___ _/ /  __ __
@@ -197,16 +197,16 @@ hackerone.com:8080
 The ports to scan for on the host can be specified via `-p` parameter (udp ports must be expressed as `u:port`). It takes nmap format ports and runs enumeration on them.
 
 ```sh
-naabu -p 80,443,21-23,u:53 -host hackerone.com
+vornex -p 80,443,21-23,u:53 -host hackerone.com
 ```
 
 For UDP scans, you can specify a custom payload to send using the `-cp` or `--connect-payload` flag. This is particularly useful for UDP services that require specific data to respond:
 
 ```sh
-naabu -p u:53 -host example.com -cp "DNS query payload"
+vornex -p u:53 -host example.com -cp "DNS query payload"
 ```
 
-By default, the Naabu checks for nmap's `Top 100` ports. It supports the following in-built port lists -
+By default, the Vornex checks for nmap's `Top 100` ports. It supports the following in-built port lists -
 
 | Flag              | Description                          |
 |-------------------|--------------------------------------|
@@ -217,18 +217,18 @@ By default, the Naabu checks for nmap's `Top 100` ports. It supports the followi
 You can also specify specific ports which you would like to exclude from the scan.
 
 ```sh
-naabu -p - -exclude-ports 80,443
+vornex -p - -exclude-ports 80,443
 ```
 
-To run the naabu on a list of hosts, `-list` option can be used.
+To run the vornex on a list of hosts, `-list` option can be used.
 
 ```sh
-naabu -list hosts.txt
+vornex -list hosts.txt
 ```
-To run the naabu on a ASN, AS input can be used. It takes the IP address available for given ASN and runs the enumeration on them.
+To run the vornex on a ASN, AS input can be used. It takes the IP address available for given ASN and runs the enumeration on them.
 
 ```console
-echo AS14421 | naabu -p 80,443
+echo AS14421 | vornex -p 80,443
 
 216.101.17.249:80
 216.101.17.249:443
@@ -242,16 +242,16 @@ echo AS14421 | naabu -p 80,443
 You can also get output in json format using `-json` switch. This switch saves the output in the JSON lines format.
 
 ```console
-naabu -host 104.16.99.52 -json
+vornex -host 104.16.99.52 -json
 
 {"ip":"104.16.99.52","port":443}
 {"ip":"104.16.99.52","port":80}
 ```
 
-The ports discovered can be piped to other tools too. For example, you can pipe the ports discovered by naabu to [httpx](https://github.com/projectdiscovery/httpx) which will then find running http servers on the host.
+The ports discovered can be piped to other tools too. For example, you can pipe the ports discovered by vornex to [httpx](https://github.com/projectdiscovery/httpx) which will then find running http servers on the host.
 
 ```console
-echo hackerone.com | naabu -silent | httpx -silent
+echo hackerone.com | vornex -silent | httpx -silent
 
 http://hackerone.com:8443
 http://hackerone.com:443
@@ -263,10 +263,10 @@ The speed can be controlled by changing the value of `rate` flag that represent 
 
 # IPv4 and IPv6
 
-Naabu supports both IPv4 and IPv6, and both are enabled by default. If IPv6 is used, connectivity must be correctly configured, and the network interface must have an IPv6 address assigned (`inet6`) and a default gateway.
+Vornex supports both IPv4 and IPv6, and both are enabled by default. If IPv6 is used, connectivity must be correctly configured, and the network interface must have an IPv6 address assigned (`inet6`) and a default gateway.
 
 ```console
-echo hackerone.com | naabu -p 80 -silent
+echo hackerone.com | vornex -p 80 -silent
 
 104.16.99.52:80
 104.16.100.52:80
@@ -277,7 +277,7 @@ echo hackerone.com | naabu -p 80 -silent
 The option `-ip-version 6` makes the tool use only IPv6 addresses while resolving domain names.
 
 ```console
-echo hackerone.com | ./naabu -p 80 -ip-version 6
+echo hackerone.com | ./vornex -p 80 -ip-version 6
 
                   __
   ___  ___  ___ _/ /  __ __
@@ -296,7 +296,7 @@ hackerone.com:80
 To scan all the IPs of both versions, `-scan-all-ips` flag can be used.
 
 ```console
-echo hackerone.com | ./naabu -sa -p 80 -silent
+echo hackerone.com | ./vornex -sa -p 80 -silent
 
 [INF] Found 1 ports on host hackerone.com (104.16.100.52)
 hackerone.com:80
@@ -310,7 +310,7 @@ hackerone.com:80
 
 # Host Discovery
 
-Naabu optionally supports multiple options to perform host discovery. Host discovery is optional and can be enabled with the `-wn` flag. `-sn` flag instructs the tool to perform host discovery only.
+Vornex optionally supports multiple options to perform host discovery. Host discovery is optional and can be enabled with the `-wn` flag. `-sn` flag instructs the tool to perform host discovery only.
 
 Available options to perform host discovery:
 
@@ -324,17 +324,17 @@ Available options to perform host discovery:
 
 # Configuration file
 
-Naabu supports config file as default located at `$HOME/.config/naabu/config.yaml`, It allows you to define any flag in the config file and set default values to include for all scans.
+Vornex supports config file as default located at `$HOME/.config/vornex/config.yaml`, It allows you to define any flag in the config file and set default values to include for all scans.
 
 
 # Nmap integration
 
-We have integrated nmap support for service discovery or any additional scans supported by nmap on the found results by Naabu, make sure you have `nmap` installed to use this feature.
+We have integrated nmap support for service discovery or any additional scans supported by nmap on the found results by Vornex, make sure you have `nmap` installed to use this feature.
 
 To use,`nmap-cli` flag can be used followed by nmap command, for example:-
 
 ```console
-echo hackerone.com | naabu -nmap-cli 'nmap -sV -oX nmap-output'
+echo hackerone.com | vornex -nmap-cli 'nmap -sV -oX nmap-output'
                   __       
   ___  ___  ___ _/ /  __ __
  / _ \/ _ \/ _ \/ _ \/ // /
@@ -366,14 +366,14 @@ PORT     STATE SERVICE       VERSION
 
 # CDN/WAF Exclusion
 
-Naabu also supports excluding CDN/WAF IPs being port scanned. If used, only `80` and `443` ports get scanned for those IPs. This feature can be enabled by using `exclude-cdn` flag.
+Vornex also supports excluding CDN/WAF IPs being port scanned. If used, only `80` and `443` ports get scanned for those IPs. This feature can be enabled by using `exclude-cdn` flag.
 
 Currently `cloudflare`, `akamai`, `incapsula` and `sucuri` IPs are supported for exclusions.
 
 # Scan Status
-Naabu exposes json scan info on a local port bound to localhost at `http://localhost:63636/metrics` (the port can be changed via the `-metrics-port` flag)
+Vornex exposes json scan info on a local port bound to localhost at `http://localhost:63636/metrics` (the port can be changed via the `-metrics-port` flag)
 
-# Using naabu as library
+# Using vornex as library
 The following sample program scan the port `80` of `scanme.sh`. The results are returned via the `OnResult` callback:
 
 ```go
@@ -384,8 +384,8 @@ import (
 
 	"context"
 	"github.com/projectdiscovery/goflags"
-	"github.com/projectdiscovery/naabu/v2/pkg/result"
-	"github.com/projectdiscovery/naabu/v2/pkg/runner"
+	"github.com/kost/vornex/v2/pkg/result"
+	"github.com/kost/vornex/v2/pkg/runner"
 )
 
 func main() {
@@ -398,26 +398,26 @@ func main() {
 		Ports: "80",
 	}
 
-	naabuRunner, err := runner.NewRunner(&options)
+	vornexRunner, err := runner.NewRunner(&options)
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer naabuRunner.Close()
+	defer vornexRunner.Close()
 
-	naabuRunner.RunEnumeration(context.Background())
+	vornexRunner.RunEnumeration(context.Background())
 }
 ```
 
 # Notes
 
-- Naabu allows arbitrary binary execution as a feature to support [nmap integration](https://github.com/projectdiscovery/naabu#nmap-integration).
-- Naabu is designed to scan ports on multiple hosts / mass port scanning. 
-- As default naabu is configured with a assumption that you are running it from VPS.
-- We suggest tuning the flags / rate if running naabu from local system.
-- For best results, run naabu as **root** user.
+- Vornex allows arbitrary binary execution as a feature to support [nmap integration](https://github.com/kost/vornex#nmap-integration).
+- Vornex is designed to scan ports on multiple hosts / mass port scanning. 
+- As default vornex is configured with a assumption that you are running it from VPS.
+- We suggest tuning the flags / rate if running vornex from local system.
+- For best results, run vornex as **root** user.
 
 -----
 
-Naabu is made with 🖤 by the [projectdiscovery](https://projectdiscovery.io) team. Community contributions have made the project what it is. 
+Vornex is made with 🖤 by the [projectdiscovery](https://projectdiscovery.io) team. Community contributions have made the project what it is. 
 
-See the **[Thanks.md](https://github.com/projectdiscovery/naabu/blob/master/THANKS.md)** file for more details.
+See the **[Thanks.md](https://github.com/kost/vornex/blob/master/THANKS.md)** file for more details.

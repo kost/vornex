@@ -7,10 +7,10 @@ import (
 	"strings"
 )
 
-// RunNaabuAndGetResults returns a list of results
-func RunNaabuAndGetResults(question string, debug bool, extra ...string) ([]string, error) {
+// RunVornexAndGetResults returns a list of results
+func RunVornexAndGetResults(question string, debug bool, extra ...string) ([]string, error) {
 	cmd := exec.Command("bash", "-c")
-	cmdLine := `echo "` + question + `" | ./naabu `
+	cmdLine := `echo "` + question + `" | ./vornex `
 	cmdLine += strings.Join(extra, " ")
 	if debug {
 		cmdLine += " -debug"
@@ -34,9 +34,9 @@ func RunNaabuAndGetResults(question string, debug bool, extra ...string) ([]stri
 	}
 	return parts, nil
 }
-func RunNaabuBinaryAndGetResults(target string, naabuBinary string, debug bool, args []string) ([]string, error) {
+func RunVornexBinaryAndGetResults(target string, vornexBinary string, debug bool, args []string) ([]string, error) {
 	cmd := exec.Command("bash", "-c")
-	cmdLine := fmt.Sprintf(`echo %s | %s `, target, naabuBinary)
+	cmdLine := fmt.Sprintf(`echo %s | %s `, target, vornexBinary)
 	cmdLine += strings.Join(args, " ")
 	if debug {
 		cmdLine += " -debug"

@@ -11,7 +11,7 @@ import (
 	"github.com/logrusorgru/aurora"
 	"github.com/pkg/errors"
 
-	"github.com/projectdiscovery/naabu/v2/internal/testutils"
+	"github.com/kost/vornex/v2/internal/testutils"
 )
 
 var (
@@ -20,9 +20,9 @@ var (
 	failed  = aurora.Red("[✘]").String()
 	errored = false
 
-	mainNaabuBinary = flag.String("main", "", "Main Branch Naabu Binary")
-	devNaabuBinary  = flag.String("dev", "", "Dev Branch Naabu Binary")
-	testcases       = flag.String("testcases", "", "Test cases file for Naabu functional tests")
+	mainVornexBinary = flag.String("main", "", "Main Branch Vornex Binary")
+	devVornexBinary  = flag.String("dev", "", "Dev Branch Vornex Binary")
+	testcases       = flag.String("testcases", "", "Test cases file for Vornex functional tests")
 )
 
 func main() {
@@ -72,13 +72,13 @@ func runIndividualTestCase(testcase string) error {
 		finalArgs = parts[2:]
 		target = parts[0]
 	}
-	mainOutput, err := testutils.RunNaabuBinaryAndGetResults(target, *mainNaabuBinary, debug, finalArgs)
+	mainOutput, err := testutils.RunVornexBinaryAndGetResults(target, *mainVornexBinary, debug, finalArgs)
 	if err != nil {
-		return errors.Wrap(err, "could not run naabu main test")
+		return errors.Wrap(err, "could not run vornex main test")
 	}
-	devOutput, err := testutils.RunNaabuBinaryAndGetResults(target, *devNaabuBinary, debug, finalArgs)
+	devOutput, err := testutils.RunVornexBinaryAndGetResults(target, *devVornexBinary, debug, finalArgs)
 	if err != nil {
-		return errors.Wrap(err, "could not run naabu dev test")
+		return errors.Wrap(err, "could not run vornex dev test")
 	}
 	if len(mainOutput) == len(devOutput) {
 		return nil

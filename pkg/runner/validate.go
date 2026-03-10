@@ -8,9 +8,9 @@ import (
 
 	"errors"
 
-	"github.com/projectdiscovery/naabu/v2/pkg/port"
-	"github.com/projectdiscovery/naabu/v2/pkg/privileges"
-	"github.com/projectdiscovery/naabu/v2/pkg/scan"
+	"github.com/kost/vornex/v2/pkg/port"
+	"github.com/kost/vornex/v2/pkg/privileges"
+	"github.com/kost/vornex/v2/pkg/scan"
 	"github.com/projectdiscovery/utils/errkit"
 	fileutil "github.com/projectdiscovery/utils/file"
 	iputil "github.com/projectdiscovery/utils/ip"

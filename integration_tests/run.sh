@@ -1,13 +1,13 @@
 #!/bin/bash
 
-echo "::group::Build naabu"
-rm integration-test naabu 2>/dev/null
-cd ../cmd/naabu
+echo "::group::Build vornex"
+rm integration-test vornex 2>/dev/null
+cd ../cmd/vornex
 go build
-mv naabu ../../integration_tests/naabu
+mv vornex ../../integration_tests/vornex
 echo "::endgroup::"
 
-echo "::group::Build naabu integration-test"
+echo "::group::Build vornex integration-test"
 cd ../integration-test
 go build
 mv integration-test ../../integration_tests/integration-test 

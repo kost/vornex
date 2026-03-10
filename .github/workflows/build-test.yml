@@ -30,7 +30,7 @@ jobs:
 
       - name: Build
         run: go build .
-        working-directory: cmd/naabu/
+        working-directory: cmd/vornex/
 
       - name: Test
         run: go test -race ./...
@@ -45,12 +45,12 @@ jobs:
       - name: Race Condition Tests - Standard User
         if: ${{ matrix.os != 'windows-latest' }}
         run: go run -race . -host scanme.sh
-        working-directory: cmd/naabu/
+        working-directory: cmd/vornex/
 
       - name: Race Condition Tests - Root User
         if: ${{ matrix.os != 'windows-latest' }}
         run: sudo go run -race . -host scanme.sh
-        working-directory: cmd/naabu/
+        working-directory: cmd/vornex/
 
   release:
     name: "Release test"

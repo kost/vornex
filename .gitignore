@@ -1,10 +1,10 @@
-cmd/naabu/naabu*
+cmd/vornex/vornex*
 vendor
-integration_tests/naabu
+integration_tests/vornex
 integration_tests/integration-test
-cmd/functional-test/naabu_dev
+cmd/functional-test/vornex_dev
 cmd/functional-test/functional-test
-cmd/functional-test/naabu
+cmd/functional-test/vornex
 cmd/functional-test/*.cfg
 .vscode
 dist

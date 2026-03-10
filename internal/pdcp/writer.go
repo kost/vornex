@@ -13,8 +13,8 @@ import (
 	"time"
 
 	"github.com/projectdiscovery/gologger"
-	"github.com/projectdiscovery/naabu/v2/pkg/result"
-	"github.com/projectdiscovery/naabu/v2/pkg/runner"
+	"github.com/kost/vornex/v2/pkg/result"
+	"github.com/kost/vornex/v2/pkg/runner"
 	"github.com/projectdiscovery/retryablehttp-go"
 	pdcpauth "github.com/projectdiscovery/utils/auth/pdcp"
 	"github.com/projectdiscovery/utils/conversion"
