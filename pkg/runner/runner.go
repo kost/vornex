@@ -541,8 +541,8 @@ func (r *Runner) RunEnumeration(pctx context.Context) error {
 			return err
 		}
 		
-		// If OnlyHostDiscovery is set and we already finished .onion checks, output and exit
-		if r.options.OnlyHostDiscovery && len(targetsV4) == 0 && len(targetsv6) == 0 && len(targetsWithPort) == 0 && r.options.ProbeTor != "" && r.scanner.HostDiscoveryResults.HasIPS() {
+		// If OnlyHostDiscovery is set and Tor probing found results, output and exit
+		if r.options.OnlyHostDiscovery && r.options.ProbeTor != "" && r.scanner.HostDiscoveryResults.HasIPS() {
 			r.handleOutput(r.scanner.HostDiscoveryResults)
 			return nil
 		}
