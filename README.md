@@ -15,16 +15,16 @@
   <a href="#installation-instructions">Installation</a> •
   <a href="#usage">Usage</a> •
   <a href="#running-vornex">Running vornex</a> •
+  <a href="#tor-support">Scanning of Tor/Onion addresses</a> •
   <a href="#configuration-file">Config</a> •
   <a href="#nmap-integration">NMAP integration</a> •
   <a href="#cdn-waf-exclusion">CDN/WAF Exclusion</a> •
-  <a href="https://discord.gg/projectdiscovery">Discord</a>
 </p>
 
 Vornex is a port scanning tool written in Go that allows you to enumerate valid ports for hosts in a fast and reliable manner. It is a really simple tool that does fast SYN/CONNECT/UDP scans on the host/list of hosts and lists
 all ports that return a reply.
 
-What is unique to Vornex is support for Tor/Onion port scanning and service scan embedded directlt in the port scanner. In short, it is naabu and nerva 
+What is unique to Vornex is support for service scan embedded and support to port scan Tor/Onion addresses. In short, it is [naabu](https://github.com/projectdiscovery/naabu) and [nerva](https://github.com/praetorian-inc/nerva) combined with specific Tor/Onion support. Some patches I have already submitted to both projects, but could not wait for upstream to implement all these changes.
 
 # Features
 
