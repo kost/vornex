@@ -1,5 +1,5 @@
 # Build
-FROM golang:1.25.7-alpine AS build-env
+FROM golang:1.26.1-alpine AS build-env
 WORKDIR /app
 COPY . /app
 RUN go mod download
