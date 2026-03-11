@@ -18,7 +18,7 @@ import (
 	"github.com/projectdiscovery/goflags"
 	"github.com/projectdiscovery/gologger"
 	pdcpauth "github.com/projectdiscovery/utils/auth/pdcp"
-	updateutils "github.com/projectdiscovery/utils/update"
+
 )
 
 var (
@@ -112,6 +112,11 @@ type Options struct {
 	ServiceVersion bool
 	// ReversePTR lookup for ips
 	ReversePTR bool
+
+	// Tor probe configuration
+	ProbeTor    string // Address of Tor ControlPort (e.g., 127.0.0.1:9051)
+	TorPassword string // Password for Tor ControlPort
+
 	//DisableUpdateCheck disables automatic update check
 	DisableUpdateCheck bool
 	// MetricsPort with statistics
@@ -215,6 +220,8 @@ func ParseOptions() *Options {
 		flagSet.BoolVarP(&options.ArpPing, "arp-ping", "arp", false, "ARP ping (host discovery needs to be enabled)"),
 		flagSet.BoolVarP(&options.IPv6NeighborDiscoveryPing, "nd-ping", "nd", false, "IPv6 Neighbor Discovery (host discovery needs to be enabled)"),
 		flagSet.BoolVar(&options.ReversePTR, "rev-ptr", false, "Reverse PTR lookup for input ips"),
+		flagSet.StringVarP(&options.ProbeTor, "probe-tor", "pt", "", "Tor ControlPort for onion alive checks (e.g. 127.0.0.1:9051)"),
+		flagSet.StringVarP(&options.TorPassword, "tor-password", "tpass", "", "Password for Tor ControlPort authentication"),
 		// The following flags are left as placeholder
 		// flagSet.StringSliceVarP(&options.IpProtocolPingProbes, "probe-ip-protocol", "po", []string{}, "IP Protocol Ping"),
 		// flagSet.StringSliceVarP(&options.UdpPingProbes, "probe-udp", "pu", []string{}, "UDP Ping"),
@@ -326,14 +333,7 @@ func ParseOptions() *Options {
 		os.Exit(0)
 	}
 
-	if !options.DisableUpdateCheck {
-		latestVersion, err := updateutils.GetToolVersionCallback("vornex", Version)()
-		if err != nil {
-			gologger.Verbose().Msgf("vornex version check failed: %v", err.Error())
-		} else {
-			gologger.Info().Msgf("Current vornex version %v %v", Version, updateutils.GetVersionDescription(Version, latestVersion))
-		}
-	}
+
 
 	// Show network configuration and exit if the user requested it
 	if options.InterfacesList {
@@ -372,6 +372,10 @@ func (options *Options) hasProbes() bool {
 
 func (options *Options) shouldUseRawPackets() bool {
 	return isOSSupported() && privileges.IsPrivileged && options.ScanType == SynScan && scan.PkgRouter != nil
+}
+
+func flagTorActive(options *Options) bool {
+	return options.ProbeTor != ""
 }
 
 func (options *Options) ShouldScanIPv4() bool {

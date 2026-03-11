@@ -171,13 +171,42 @@ func (r *Runner) AddTarget(target string) error {
 		}
 		return nil
 	}
-
 	host, port, hasPort := getPort(target)
 
 	targetToResolve := target
 	if hasPort {
 		targetToResolve = host
 	}
+
+	// Provide tor probe interception directly at AddTarget
+	if strings.HasSuffix(strings.ToLower(targetToResolve), ".onion") && r.options.ProbeTor != "" {
+		alive, err := isOnionAlive(targetToResolve, r.options.ProbeTor, r.options.TorPassword)
+		if err != nil {
+			gologger.Warning().Msgf("Tor Probe Error on %s: %s\n", targetToResolve, err)
+		} else if alive {
+			gologger.Debug().Msgf("Tor Probe successful on %s\n", targetToResolve)
+			r.scanner.HostDiscoveryResults.AddIp(targetToResolve)
+			
+			// We simulate an IP entry so that down-stream TCP connect scans can be executed
+			if hasPort {
+				if r.options.Stream {
+					r.streamChannel <- Target{Ip: targetToResolve, Port: port}
+				}
+				if err := r.scanner.IPRanger.AddHostWithMetadata(joinHostPort(targetToResolve, port), targetToResolve); err != nil {
+					gologger.Warning().Msgf("%s\n", err)
+				}
+			} else {
+				if err := r.scanner.IPRanger.AddHostWithMetadata(targetToResolve, targetToResolve); err != nil {
+					gologger.Warning().Msgf("%s\n", err)
+				}
+			}
+		} else {
+			gologger.Debug().Msgf("Tor Probe: %s is DEAD\n", targetToResolve)
+		}
+		// Return strictly, ignoring standard DNS resolving
+		return nil
+	}
+
 	ips, err := r.resolveFQDN(targetToResolve)
 	if err != nil {
 		return err

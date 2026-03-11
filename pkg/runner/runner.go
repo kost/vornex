@@ -210,7 +210,7 @@ func NewRunner(options *Options) (*Runner, error) {
 func (r *Runner) onReceive(hostResult *result.HostResult) {
 	if r.options.Proxy != "" && !iputil.IsIP(hostResult.IP) {
 		// skip version check for proxy hostnames
-	} else if !ipMatchesIpVersions(hostResult.IP, r.options.IPVersion...) {
+	} else if !ipMatchesIpVersions(hostResult.IP, r.options.IPVersion...) && !strings.HasSuffix(strings.ToLower(hostResult.IP), ".onion") {
 		return
 	}
 
@@ -540,6 +540,12 @@ func (r *Runner) RunEnumeration(pctx context.Context) error {
 		if err != nil {
 			return err
 		}
+		
+		// If OnlyHostDiscovery is set and we already finished .onion checks, output and exit
+		if r.options.OnlyHostDiscovery && len(targetsV4) == 0 && len(targetsv6) == 0 && len(targetsWithPort) == 0 && r.options.ProbeTor != "" && r.scanner.HostDiscoveryResults.HasIPS() {
+			r.handleOutput(r.scanner.HostDiscoveryResults)
+			return nil
+		}
 		var targetsCount, portsCount, targetsWithPortCount uint64
 		for _, target := range append(targetsV4, targetsv6...) {
 			if target == nil {
@@ -639,18 +645,30 @@ func (r *Runner) RunEnumeration(pctx context.Context) error {
 			for _, targetWithPort := range targetsWithPort {
 				ip, p, err := net.SplitHostPort(targetWithPort)
 				if err != nil {
-					if r.options.Proxy != "" && strings.Contains(err.Error(), "missing port in address") {
-						for _, port := range r.scanner.Ports {
+					if (r.options.Proxy != "" || strings.HasSuffix(strings.ToLower(targetWithPort), ".onion")) && strings.Contains(err.Error(), "missing port in address") {
+						var onionWg sync.WaitGroup
+						for _, scanPort := range r.scanner.Ports {
 							if shouldUseRawPackets {
-								r.RawSocketEnumeration(ctx, targetWithPort, port)
+								r.RawSocketEnumeration(ctx, targetWithPort, scanPort)
 							} else {
-								r.wgscan.Add()
-								go r.handleHostPort(ctx, targetWithPort, payload, port)
+								onionWg.Add(1)
+								go func(p *port.Port) {
+									defer onionWg.Done()
+									r.limiter.Take()
+									open, dialErr := r.scanner.ConnectPort(targetWithPort, payload, p, r.options.GetTimeout())
+									if open && dialErr == nil {
+										r.scanner.ScanResults.AddPort(targetWithPort, p)
+										if !r.options.Verify && r.scanner.OnReceive != nil {
+											r.scanner.OnReceive(&result.HostResult{IP: targetWithPort, Ports: []*port.Port{p}})
+										}
+									}
+								}(scanPort)
 							}
 							if r.options.EnableProgressBar {
 								r.stats.IncrementCounter("packets", 1)
 							}
 						}
+						onionWg.Wait()
 					} else {
 						gologger.Debug().Msgf("Skipping %s: %v\n", targetWithPort, err)
 					}
@@ -753,6 +771,11 @@ func (r *Runner) GetTargetIps(ipsCallback func() ([]*net.IPNet, []string)) (targ
 	// shrinks the ips to the minimum amount of cidr
 	targetsV4, targetsV6 = mapcidr.CoalesceCIDRs(targets)
 	if len(targetsV4) == 0 && len(targetsV6) == 0 && len(targetsWithPort) == 0 {
+		// If ProbeTor is being used, we might only have .onion addresses in HostDiscoveryResults
+		// Check if we found onions
+		if r.options.ProbeTor != "" && r.scanner.HostDiscoveryResults.HasIPS() {
+			return nil, nil, nil, nil, nil
+		}
 		return nil, nil, nil, nil, errors.New("no valid ipv4 or ipv6 targets were found")
 	}
 
@@ -1069,14 +1092,21 @@ func (r *Runner) handleOutput(scanResults *result.Result) {
 	switch {
 	case scanResults.HasIPsPorts():
 		for hostResult := range scanResults.GetIPsPorts() {
-			dt, err := r.scanner.IPRanger.GetHostsByIP(hostResult.IP)
-			if err != nil {
-				continue
+			var dt []string
+			var err error
+
+			if strings.HasSuffix(strings.ToLower(hostResult.IP), ".onion") {
+				dt = []string{hostResult.IP}
+			} else {
+				dt, err = r.scanner.IPRanger.GetHostsByIP(hostResult.IP)
+				if err != nil {
+					continue
+				}
 			}
 
 			if r.options.Proxy != "" && !iputil.IsIP(hostResult.IP) {
 				// skip version check for proxy hostnames
-			} else if !ipMatchesIpVersions(hostResult.IP, r.options.IPVersion...) {
+			} else if !ipMatchesIpVersions(hostResult.IP, r.options.IPVersion...) && !strings.HasSuffix(strings.ToLower(hostResult.IP), ".onion") {
 				continue
 			}
 
@@ -1197,13 +1227,20 @@ func (r *Runner) handleOutput(scanResults *result.Result) {
 		}
 	case scanResults.HasIPS():
 		for hostIP := range scanResults.GetIPs() {
-			dt, err := r.scanner.IPRanger.GetHostsByIP(hostIP)
-			if err != nil {
-				continue
+			var dt []string
+			var err error
+
+			if strings.HasSuffix(strings.ToLower(hostIP), ".onion") {
+				dt = []string{hostIP}
+			} else {
+				dt, err = r.scanner.IPRanger.GetHostsByIP(hostIP)
+				if err != nil {
+					continue
+				}
 			}
 			if r.options.Proxy != "" && !iputil.IsIP(hostIP) {
 				// skip version check for proxy hostnames
-			} else if !ipMatchesIpVersions(hostIP, r.options.IPVersion...) {
+			} else if !ipMatchesIpVersions(hostIP, r.options.IPVersion...) && !strings.HasSuffix(strings.ToLower(hostIP), ".onion") {
 				continue
 			}
 

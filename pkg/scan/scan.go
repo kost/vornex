@@ -396,13 +396,29 @@ func (s *Scanner) ConnectPort(host, payload string, p *port.Port, timeout time.D
 		conn net.Conn
 	)
 	if s.proxyDialer != nil {
-		ctx, cancel := context.WithTimeout(context.Background(), limits.TimeoutWithProxy(timeout))
-		defer cancel()
+		dialTimeout := limits.TimeoutWithProxy(timeout)
 		proxyDialer, ok := s.proxyDialer.(proxy.ContextDialer)
 		if !ok {
 			return false, errors.New("invalid proxy dialer")
 		}
-		conn, err = proxyDialer.DialContext(ctx, p.Protocol.String(), hostport)
+		type dialResult struct {
+			conn net.Conn
+			err  error
+		}
+		resultCh := make(chan dialResult, 1)
+		ctx, cancel := context.WithTimeout(context.Background(), dialTimeout)
+		defer cancel()
+		go func() {
+			c, e := proxyDialer.DialContext(ctx, p.Protocol.String(), hostport)
+			resultCh <- dialResult{c, e}
+		}()
+		select {
+		case result := <-resultCh:
+			conn = result.conn
+			err = result.err
+		case <-ctx.Done():
+			return false, ctx.Err()
+		}
 		if err != nil {
 			return false, err
 		}

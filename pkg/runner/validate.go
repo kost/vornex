@@ -124,8 +124,8 @@ func (options *Options) ValidateOptions() error {
 		return errors.New("discovery probes were provided but host discovery is disabled")
 	}
 
-	// Host Discovery mode needs provileged access
-	if options.OnlyHostDiscovery && !privileges.IsPrivileged {
+	// Host Discovery mode typically needs privileged access, except when only Tor probing is used
+	if options.OnlyHostDiscovery && !privileges.IsPrivileged && options.ProbeTor == "" {
 		if osutil.IsWindows() {
 			return errors.New("host discovery not (yet) supported on windows")
 		}
@@ -194,11 +194,14 @@ func (options *Options) configureHostDiscovery(ports []*port.Port) {
 		// - TCP SYN on port 443
 		// - TCP ACK on port 80
 		// - TCP ACK on port 443
-		options.IcmpEchoRequestProbe = true
-		options.IcmpTimestampRequestProbe = true
-		options.TcpSynPingProbes = append(options.TcpSynPingProbes, "80")
-		options.TcpSynPingProbes = append(options.TcpSynPingProbes, "443")
-		options.TcpAckPingProbes = append(options.TcpAckPingProbes, "80")
-		options.TcpAckPingProbes = append(options.TcpAckPingProbes, "443")
+		// (Unless only doing Tor probing, where this is not functionally required)
+		if options.ProbeTor == "" {
+			options.IcmpEchoRequestProbe = true
+			options.IcmpTimestampRequestProbe = true
+			options.TcpSynPingProbes = append(options.TcpSynPingProbes, "80")
+			options.TcpSynPingProbes = append(options.TcpSynPingProbes, "443")
+			options.TcpAckPingProbes = append(options.TcpAckPingProbes, "80")
+			options.TcpAckPingProbes = append(options.TcpAckPingProbes, "443")
+		}
 	}
 }
