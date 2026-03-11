@@ -8,8 +8,6 @@
 <a href="https://github.com/kost/vornex/issues"><img src="https://img.shields.io/badge/contributions-welcome-brightgreen.svg?style=flat"></a>
 <a href="https://goreportcard.com/badge/github.com/kost/vornex"><img src="https://goreportcard.com/badge/github.com/kost/vornex"></a>
 <a href="https://github.com/kost/vornex/releases"><img src="https://img.shields.io/github/release/projectdiscovery/vornex"></a>
-<a href="https://twitter.com/pdiscoveryio"><img src="https://img.shields.io/twitter/follow/pdiscoveryio.svg?logo=twitter"></a>
-<a href="https://discord.gg/projectdiscovery"><img src="https://img.shields.io/discord/695645237418131507.svg?logo=discord"></a>
 </p>
 
 <p align="center">
@@ -26,12 +24,9 @@
 Vornex is a port scanning tool written in Go that allows you to enumerate valid ports for hosts in a fast and reliable manner. It is a really simple tool that does fast SYN/CONNECT/UDP scans on the host/list of hosts and lists
 all ports that return a reply.
 
-# Features
+What is unique to Vornex is support for Tor/Onion port scanning and service scan embedded directlt in the port scanner. In short, it is naabu and nerva 
 
-<h1 align="center">
-  <img src="https://user-images.githubusercontent.com/8293321/180417395-25b1b990-c032-4b5c-9b66-03b58db0789a.png" alt="vornex" width="700px">
-  <br>
-</h1>
+# Features
 
  - Fast And Simple **SYN/CONNECT/UDP** probe based scanning
  - Optimized for ease of use and **lightweight** on resources
@@ -149,7 +144,7 @@ CLOUD:
 
 # Installation Instructions
 
-Download the ready to run [binary](https://github.com/kost/vornex/releases/) / [docker](https://hub.docker.com/r/projectdiscovery/vornex) or install with GO
+Download the ready to run [binary](https://github.com/kost/vornex/releases/) or install with GO
 
 ## Prerequisite
 
@@ -321,6 +316,67 @@ Available options to perform host discovery:
 - ICMP **timestamp** ping (`-pp`)
 - ICMP **address mask** ping (`-pm`)
 - IPv6 **neighbor discovery** (`-nd`)
+
+# Tor support
+
+Scanning of Tor/Onion addresses is supported using standard TCP port scan, but you need to specify Tor Socks Proxy port using -proxy:
+
+```console
+% ./vornex -proxy 127.0.0.1:9050 -host duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion -p 80,443,22
+
+                   __
+ _  _____  _______/ /__ __
+| |/ / _ \/ __/ _ \// -_) \ /
+|___/\___/_/ /_//_/\__/_\_\
+
+	github.com/kost/vornex - based on naabu and nerva
+
+[WRN] UI Dashboard is disabled, Use -dashboard option to enable
+[INF] Running CONNECT scan with non root privileges
+duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:443
+duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:80
+[INF] Found 2 ports on host duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion (duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion)
+duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:80
+duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:443
+```
+
+Host discovery is using Tor Control port (usually 9051), but you need to enable it in Tor configuration (comment out `ControlPort 9051`) and run following:
+```console
+% ./vornex -pt 127.0.0.1:9051 -sn -host duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion
+
+                   __
+ _  _____  _______/ /__ __
+| |/ / _ \/ __/ _ \// -_) \ /
+|___/\___/_/ /_//_/\__/_\_\
+
+	github.com/kost/vornex - based on naabu and nerva
+
+[WRN] UI Dashboard is disabled, Use -dashboard option to enable
+[INF] Running Host Discovery
+[INF] Found alive host duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion (duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion)
+duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion
+```
+
+If you need to perform host discovery (-pt) and scanning, you need to specify both Tor Socks proxy port (usually 9050) and Tor Control port (usually 9051):
+```console
+% ./vornex -pt 127.0.0.1:9051 -proxy 127.0.0.1:9050 -host duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion -p 80,443,22
+
+                   __
+ _  _____  _______/ /__ __
+| |/ / _ \/ __/ _ \// -_) \ /
+|___/\___/_/ /_//_/\__/_\_\
+
+	github.com/kost/vornex - based on naabu and nerva
+
+[WRN] UI Dashboard is disabled, Use -dashboard option to enable
+[INF] Running CONNECT scan with non root privileges
+duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:80
+duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:443
+[INF] Found 2 ports on host duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion (duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion)
+duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:80
+duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:443
+```
+
 
 # Configuration file
 
