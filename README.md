@@ -26,6 +26,14 @@ all ports that return a reply.
 
 What is unique to Vornex is support for service scan embedded and support to port scan Tor/Onion addresses. In short, it is [naabu](https://github.com/projectdiscovery/naabu) and [nerva](https://github.com/praetorian-inc/nerva) combined with specific Tor/Onion support. Some patches I have already submitted to both projects, but could not wait for upstream to implement all these changes.
 
+# Unique features
+
+ - Service scanning
+ - Tor onion addresses host discovery
+ - Port scanning of Tor/Onion addresses
+ - Dynamic loading of libpcap if found
+ - Full static build if libpcap is not needed (`-tags nopcap`)
+
 # Features
 
  - Fast And Simple **SYN/CONNECT/UDP** probe based scanning
@@ -50,7 +58,7 @@ This will display help for the tool. Here are all the switches it supports.
 
 ```yaml
 Usage:
-  vornex [flags]
+  ./vornex [flags]
 
 Flags:
 INPUT:
@@ -60,13 +68,13 @@ INPUT:
    -exclude-file, -ef string   list of hosts to exclude from scan (file)
 
 PORT:
-   -port, -p string            ports to scan (80,443, 100-200)
-   -top-ports, -tp string      top ports to scan (default 100) [full,100,1000]
-   -exclude-ports, -ep string  ports to exclude from scan (comma-separated)
-   -ports-file, -pf string     list of ports to scan (file)
-   -port-threshold, -pts int   port threshold to skip port scan for the host
-   -exclude-cdn, -ec           skip full port scans for CDN/WAF (only scan for port 80,443)
-   -display-cdn, -cdn          display cdn in use
+   -port, -p string              ports to scan (80,443, 100-200)
+   -top-ports, -tp string        top ports to scan (default 100) [full,100,1000]
+   -exclude-ports, -ep string[]  ports to exclude from scan (file or comma-separated)
+   -ports-file, -pf string[]     list of ports to scan (file or comma-separated)
+   -port-threshold, -pts int     port threshold to skip port scan for the host
+   -exclude-cdn, -ec             skip full port scans for CDN/WAF (only scan for port 80,443)
+   -display-cdn, -cdn            display cdn in use
 
 RATE-LIMIT:
    -c int     general internal worker threads (default 25)
@@ -77,17 +85,19 @@ UPDATE:
    -duc, -disable-update-check  disable automatic vornex update check
 
 OUTPUT:
-   -o, -output string  file to write output to (optional)
-   -j, -json           write output in JSON lines format
-   -csv                write output in csv format
+   -o, -output string                     file to write output to (optional)
+   -lof, -list-output-fields              list of fields to output (comma separated)
+   -eof, -exclude-output-fields string[]  exclude output fields output based on a condition
+   -j, -json                              write output in JSON lines format
+   -csv                                   write output in csv format
 
 CONFIGURATION:
    -config string                   path to the vornex configuration file (default $HOME/.config/vornex/config.yaml)
    -scan-all-ips, -sa               scan all the IP's associated with DNS record
-   -ip-version, -iv string[]        ip version to scan of hostname (4,6) - (default 4,6) (default ["4","6"])
+   -ip-version, -iv string[]        ip version to scan of hostname (4,6) - (default 4,6) (default ["4", "6"])
    -scan-type, -s string            type of port scan (SYN/CONNECT) (default "c")
-   -source-ip string                source ip and port (x.x.x.x:yyy - might not work on OSX) 
-   -cp, -connect-payload string    payload to send in CONNECT scans (optional)
+   -source-ip string                source ip and port (x.x.x.x:yyy - might not work on OSX)
+   -connect-payload, -cp string     payload to send in CONNECT scans (optional)
    -interface-list, -il             list available interfaces and public ip
    -interface, -i string            network Interface to use for port scan
    -nmap                            invoke nmap scan on targets (nmap must be installed) - Deprecated
@@ -95,6 +105,7 @@ CONFIGURATION:
    -r string                        list of custom resolver dns resolution (comma separated or from file)
    -proxy string                    socks5 proxy (ip[:port] / fqdn[:port]
    -proxy-auth string               socks5 proxy authentication (username:password)
+   -dns-order string                dns resolution order (p/l/lp/pl) (default "lp")
    -resume                          resume scan using resume.cfg
    -stream                          stream mode (disables resume, nmap, verify, retries, shuffling, etc)
    -passive                         display passive open ports using shodan internetdb api
@@ -103,7 +114,7 @@ CONFIGURATION:
 
 HOST-DISCOVERY:
    -sn, -host-discovery           Perform Only Host Discovery
-   -Pn, -skip-host-discovery      Skip Host discovery (Deprecated: use -wn/-with-host-discovery instead)
+   -Pn, -skip-host-discovery      Skip Host discovery
    -wn, -with-host-discovery      Enable Host discovery
    -ps, -probe-tcp-syn string[]   TCP SYN Ping (host discovery needs to be enabled)
    -pa, -probe-tcp-ack string[]   TCP ACK Ping (host discovery needs to be enabled)
@@ -113,10 +124,16 @@ HOST-DISCOVERY:
    -arp, -arp-ping                ARP ping (host discovery needs to be enabled)
    -nd, -nd-ping                  IPv6 Neighbor Discovery (host discovery needs to be enabled)
    -rev-ptr                       Reverse PTR lookup for input ips
+   -pt, -probe-tor string         Tor ControlPort for onion alive checks (e.g. 127.0.0.1:9051)
+   -tpass, -tor-password string   Password for Tor ControlPort authentication
+
+SERVICES-DISCOVERY:
+   -sD, -service-discovery  Service Discovery
+   -sV, -service-version    Service Version
 
 OPTIMIZATION:
    -retries int       number of retries for the port scan (default 3)
-   -timeout int       millisecond to wait before timing out (default 1000)
+   -timeout value     millisecond to wait before timing out (default 1s)
    -warm-up-time int  time in seconds between scan phases (default 2)
    -ping              ping probes for verification of host
    -verify            validate the ports again with TCP verification
@@ -171,12 +188,12 @@ This will run the tool against hackerone.com. There are a number of configuratio
 ```console
 vornex -host hackerone.com
 
-                  __
-  ___  ___  ___ _/ /  __ __
- / _ \/ _ \/ _ \/ _ \/ // /
-/_//_/\_,_/\_,_/_.__/\_,_/ v2.0.3
+                   __
+ _  _____  _______/ /__ __
+| |/ / _ \/ __/ _ \// -_) \ /
+|___/\___/_/ /_//_/\__/_\_\
 
-    projectdiscovery.io
+        github.com/kost/vornex - based on naabu and nerva
 
 [WRN] Use with caution. You are responsible for your actions
 [WRN] Developers assume no liability and are not responsible for any misuse or damage.
@@ -274,12 +291,12 @@ The option `-ip-version 6` makes the tool use only IPv6 addresses while resolvin
 ```console
 echo hackerone.com | ./vornex -p 80 -ip-version 6
 
-                  __
-  ___  ___  ___ _/ /  __ __
- / _ \/ _ \/ _ \/ _ \/ // /
-/_//_/\_,_/\_,_/_.__/\_,_/ v2.0.8
+                   __
+ _  _____  _______/ /__ __
+| |/ / _ \/ __/ _ \// -_) \ /
+|___/\___/_/ /_//_/\__/_\_\
 
-      projectdiscovery.io
+        github.com/kost/vornex - based on naabu and nerva
 
 Use with caution. You are responsible for your actions
 Developers assume no liability and are not responsible for any misuse or damage.
@@ -316,6 +333,8 @@ Available options to perform host discovery:
 - ICMP **timestamp** ping (`-pp`)
 - ICMP **address mask** ping (`-pm`)
 - IPv6 **neighbor discovery** (`-nd`)
+
+- Tor using Controlport (`-pt`)
 
 # Tor support
 
@@ -391,12 +410,13 @@ To use,`nmap-cli` flag can be used followed by nmap command, for example:-
 
 ```console
 echo hackerone.com | vornex -nmap-cli 'nmap -sV -oX nmap-output'
-                  __       
-  ___  ___  ___ _/ /  __ __
- / _ \/ _ \/ _ \/ _ \/ // /
-/_//_/\_,_/\_,_/_.__/\_,_/ v2.0.0        
 
-    projectdiscovery.io
+                   __
+ _  _____  _______/ /__ __
+| |/ / _ \/ __/ _ \// -_) \ /
+|___/\___/_/ /_//_/\__/_\_\
+
+        github.com/kost/vornex - based on naabu and nerva
 
 [WRN] Use with caution. You are responsible for your actions
 [WRN] Developers assume no liability and are not responsible for any misuse or damage.
@@ -474,6 +494,6 @@ func main() {
 
 -----
 
-Vornex is made with 🖤 by the [projectdiscovery](https://projectdiscovery.io) team. Community contributions have made the project what it is. 
+Vornex is made with 🖤 by kost. But it would not exist without [naabu](https://github.com/projectdiscovery/naabu) and [nerva](https://github.com/praetorian-inc/nerva). Huge shoot out to [projectdiscovery](https://projectdiscovery.io) team and [Praetorian](https://github.com/praetorian-inc). Community contributions have made the project what it is.
 
 See the **[Thanks.md](https://github.com/kost/vornex/blob/master/THANKS.md)** file for more details.
