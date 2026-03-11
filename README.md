@@ -21,12 +21,12 @@
 Vornex is a port scanning tool written in Go that allows you to enumerate valid ports for hosts in a fast and reliable manner. It is a really simple tool that does fast SYN/CONNECT/UDP scans on the host/list of hosts and lists
 all ports that return a reply.
 
-What is unique to Vornex is support for service scan embedded and support to port scan Tor/Onion addresses. In short, it is [naabu](https://github.com/projectdiscovery/naabu) and [nerva](https://github.com/praetorian-inc/nerva) combined with specific Tor/Onion support. Some patches I have already submitted to both projects, but could not wait for upstream to implement all these changes.
+What is unique to Vornex is support for service scan and support to port scan Tor/Onion addresses. In short, it is [naabu](https://github.com/projectdiscovery/naabu) and [nerva](https://github.com/praetorian-inc/nerva) combined with specific Tor/Onion support. Some patches I have already submitted to both projects, but could not wait for upstream to implement all these changes.
 
 # Unique features
 
- - Service scanning
- - Tor onion addresses host discovery
+ - Service scanning embedded
+ - Tor/Onion addresses host discovery
  - Port scanning of Tor/Onion addresses
  - Dynamic loading of libpcap if found
  - Full static build if libpcap is not needed (`-tags nopcap`)
@@ -164,7 +164,7 @@ Download the ready to run [binary](https://github.com/kost/vornex/releases/) or 
 
 > **Note**: before installing vornex, make sure to install `libpcap` library for packet capturing.
 
-To install libcap on **Linux**: `sudo apt install -y libpcap-dev`, on **Mac**: `brew install libpcap`
+To install libcap on **Linux**: `sudo apt install -y libpcap`, on **Mac**: `brew install libpcap`
 
 
 ## Installing Vornex
@@ -375,7 +375,7 @@ duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion
 
 If you need to perform host discovery (-pt) and scanning, you need to specify both Tor Socks proxy port (usually 9050) and Tor Control port (usually 9051):
 ```console
-% ./vornex -pt 127.0.0.1:9051 -proxy 127.0.0.1:9050 -host duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion -p 80,443,22
+% ./vornex -pt 127.0.0.1:9051 -proxy 127.0.0.1:9050 -sV -p 80,443,22 -host duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion
 
                    __
  _  _____  _______/ /__ __
@@ -386,11 +386,9 @@ If you need to perform host discovery (-pt) and scanning, you need to specify bo
 
 [WRN] UI Dashboard is disabled, Use -dashboard option to enable
 [INF] Running CONNECT scan with non root privileges
-duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:80
-duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:443
+duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:80 [http nginx]
+duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:443 [https nginx]
 [INF] Found 2 ports on host duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion (duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion)
-duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:80
-duckduckgogg42xjoc72x3sjasowoarfbgcmvfimaftt6twagswzczad.onion:443
 ```
 
 
