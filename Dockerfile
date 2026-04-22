@@ -1,12 +1,12 @@
 # Build
-FROM golang:1.25.7-alpine AS build-env
+FROM golang:1.26.2-alpine AS build-env
 WORKDIR /app
 COPY . /app
 RUN go mod download
 RUN CGO_ENABLED=0 go build ./cmd/vornex
 
 # Release
-FROM alpine:3.23.3
+FROM alpine:3.23.4
 RUN apk upgrade --no-cache \
     && apk add --no-cache nmap libpcap bind-tools ca-certificates nmap-scripts
 COPY --from=build-env /app/vornex /usr/local/bin/
